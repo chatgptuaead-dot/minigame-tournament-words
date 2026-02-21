@@ -24,6 +24,7 @@ class RansomNoteGame {
     this.messageTick = 0;
     this.done = false;
     this.animT = 0;
+    this._mobileInput = null;
     this._onKey = this._onKey.bind(this);
   }
 
@@ -49,45 +50,52 @@ class RansomNoteGame {
     window.removeEventListener('keydown', this._onKey);
     const mc = document.getElementById('mobile-controls');
     if (mc) { mc.innerHTML = ''; mc.className = 'mobile-controls'; }
+    this._mobileInput = null;
   }
 
   _buildMobileControls() {
     const mc = document.getElementById('mobile-controls');
     if (!mc) return;
     mc.className = 'mobile-controls active';
-    mc.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px;pointer-events:all;position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.5);';
-    const rows = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'];
+    mc.style.cssText = 'display:flex;flex-direction:row;align-items:center;gap:8px;padding:12px 16px;pointer-events:all;position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.85);box-sizing:border-box;';
     mc.innerHTML = '';
-    rows.forEach((row, ri) => {
-      const rowEl = document.createElement('div');
-      rowEl.style.cssText = 'display:flex;gap:3px;';
-      if (ri === 2) {
-        const enter = document.createElement('button');
-        enter.textContent = '↵';
-        enter.style.cssText = 'padding:6px 9px;background:rgba(0,212,255,0.3);border:1px solid #00d4ff;color:#fff;border-radius:4px;font-size:13px;cursor:pointer;';
-        enter.addEventListener('click', () => this._submit());
-        rowEl.appendChild(enter);
-      }
-      row.split('').forEach(ch => {
-        const btn = document.createElement('button');
-        btn.textContent = ch;
-        btn.style.cssText = 'width:26px;height:34px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;border-radius:4px;font-size:12px;font-weight:bold;cursor:pointer;';
-        btn.addEventListener('click', () => this._type(ch));
-        rowEl.appendChild(btn);
-      });
-      if (ri === 2) {
-        const del = document.createElement('button');
-        del.textContent = '⌫';
-        del.style.cssText = 'padding:6px 9px;background:rgba(255,100,100,0.3);border:1px solid #ff4444;color:#fff;border-radius:4px;font-size:13px;cursor:pointer;';
-        del.addEventListener('click', () => this._delete());
-        rowEl.appendChild(del);
-      }
-      mc.appendChild(rowEl);
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = 'Type a word…';
+    input.autocomplete = 'off';
+    input.setAttribute('autocorrect', 'off');
+    input.setAttribute('autocapitalize', 'characters');
+    input.setAttribute('spellcheck', 'false');
+    input.style.cssText = 'flex:1;min-width:0;padding:14px 16px;background:rgba(255,255,255,0.08);border:2px solid rgba(0,212,255,0.55);color:#fff;border-radius:10px;font-size:20px;font-family:"Exo 2",sans-serif;font-weight:700;outline:none;letter-spacing:2px;caret-color:#00d4ff;-webkit-appearance:none;';
+
+    input.addEventListener('input', () => {
+      this.current = input.value.toUpperCase().replace(/[^A-Z]/g, '');
+      input.value = this.current;
     });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); this._submit(); }
+    });
+
+    const delBtn = document.createElement('button');
+    delBtn.textContent = '⌫';
+    delBtn.style.cssText = 'padding:14px 16px;background:rgba(255,80,80,0.2);border:2px solid rgba(255,80,80,0.5);color:#ff8080;border-radius:10px;font-size:20px;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;';
+    delBtn.addEventListener('click', () => { this._delete(); input.focus(); });
+
+    const submitBtn = document.createElement('button');
+    submitBtn.textContent = '↵ ADD';
+    submitBtn.style.cssText = 'padding:14px 16px;background:linear-gradient(135deg,rgba(0,255,136,0.3),rgba(0,212,255,0.3));border:2px solid #00ff88;color:#fff;border-radius:10px;font-size:14px;font-family:"Orbitron",sans-serif;font-weight:900;cursor:pointer;white-space:nowrap;flex-shrink:0;letter-spacing:1px;-webkit-tap-highlight-color:transparent;';
+    submitBtn.addEventListener('click', () => { this._submit(); input.focus(); });
+
+    mc.appendChild(input);
+    mc.appendChild(delBtn);
+    mc.appendChild(submitBtn);
+    this._mobileInput = input;
   }
 
   _onKey(e) {
     if (this.done) return;
+    if (document.activeElement === this._mobileInput) return;
     if (e.key === 'Enter') this._submit();
     else if (e.key === 'Backspace') this._delete();
     else if (/^[a-zA-Z]$/.test(e.key)) this._type(e.key.toUpperCase());
@@ -96,17 +104,21 @@ class RansomNoteGame {
   _type(ch) {
     if (this.done || this.current.length >= this.sourceWord.length) return;
     this.current += ch;
+    if (this._mobileInput) this._mobileInput.value = this.current;
   }
 
   _delete() {
     if (this.done) return;
     this.current = this.current.slice(0, -1);
+    if (this._mobileInput) this._mobileInput.value = this.current;
   }
 
   _submit() {
     if (this.done) return;
+    if (this._mobileInput) this.current = this._mobileInput.value;
     const w = this.current.toUpperCase();
     this.current = '';
+    if (this._mobileInput) this._mobileInput.value = '';
     if (w.length < 2) {
       this._showMsg('Too short!', '#ff4d6d');
       return;

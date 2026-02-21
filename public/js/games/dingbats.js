@@ -1,5 +1,5 @@
 /* ===== DINGBATS GAME =====
-   Look at the visual/text clue and type the phrase it represents (5 puzzles, 20s each)
+   Look at the visual/text clue and type the phrase it represents (5 puzzles, 30s each)
 */
 class DingbatsGame {
   constructor(canvas, config) {
@@ -20,12 +20,13 @@ class DingbatsGame {
     this.current = '';
     this.answered = false;
     this.correct = false;
-    this.timeLeft = 40;
+    this.timeLeft = 30;
     this.timerId = null;
     this.done = false;
     this.resultTick = 0;
     this.animT = 0;
     this.hintShown = false;
+    this._mobileInput = null;
     this._onKey = this._onKey.bind(this);
   }
 
@@ -44,46 +45,47 @@ class DingbatsGame {
     window.removeEventListener('keydown', this._onKey);
     const mc = document.getElementById('mobile-controls');
     if (mc) { mc.innerHTML = ''; mc.className = 'mobile-controls'; }
+    this._mobileInput = null;
   }
 
   _buildMobileControls() {
     const mc = document.getElementById('mobile-controls');
     if (!mc) return;
     mc.className = 'mobile-controls active';
-    mc.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px;pointer-events:all;position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.5);';
-    const rows = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'];
+    mc.style.cssText = 'display:flex;flex-direction:row;align-items:center;gap:8px;padding:12px 16px;pointer-events:all;position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.85);box-sizing:border-box;';
     mc.innerHTML = '';
-    rows.forEach((row, ri) => {
-      const rowEl = document.createElement('div');
-      rowEl.style.cssText = 'display:flex;gap:3px;';
-      if (ri === 2) {
-        const enter = document.createElement('button');
-        enter.textContent = '↵';
-        enter.style.cssText = 'padding:6px 9px;background:rgba(0,212,255,0.3);border:1px solid #00d4ff;color:#fff;border-radius:4px;font-size:13px;cursor:pointer;';
-        enter.addEventListener('click', () => this._submit());
-        rowEl.appendChild(enter);
-      }
-      row.split('').forEach(ch => {
-        const btn = document.createElement('button');
-        btn.textContent = ch;
-        btn.style.cssText = 'width:26px;height:34px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;border-radius:4px;font-size:12px;font-weight:bold;cursor:pointer;';
-        btn.addEventListener('click', () => this._type(ch));
-        rowEl.appendChild(btn);
-      });
-      if (ri === 2) {
-        const space = document.createElement('button');
-        space.textContent = 'SPC';
-        space.style.cssText = 'padding:6px 9px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);color:#fff;border-radius:4px;font-size:11px;cursor:pointer;';
-        space.addEventListener('click', () => this._type(' '));
-        rowEl.appendChild(space);
-        const del = document.createElement('button');
-        del.textContent = '⌫';
-        del.style.cssText = 'padding:6px 9px;background:rgba(255,100,100,0.3);border:1px solid #ff4444;color:#fff;border-radius:4px;font-size:13px;cursor:pointer;';
-        del.addEventListener('click', () => this._delete());
-        rowEl.appendChild(del);
-      }
-      mc.appendChild(rowEl);
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = 'Type your answer…';
+    input.autocomplete = 'off';
+    input.setAttribute('autocorrect', 'off');
+    input.setAttribute('autocapitalize', 'characters');
+    input.setAttribute('spellcheck', 'false');
+    input.style.cssText = 'flex:1;min-width:0;padding:14px 16px;background:rgba(255,255,255,0.08);border:2px solid rgba(0,212,255,0.55);color:#fff;border-radius:10px;font-size:20px;font-family:"Exo 2",sans-serif;font-weight:700;outline:none;letter-spacing:2px;caret-color:#00d4ff;-webkit-appearance:none;';
+
+    input.addEventListener('input', () => {
+      this.current = input.value.toUpperCase().replace(/[^A-Z ]/g, '');
+      input.value = this.current;
     });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); this._submit(); }
+    });
+
+    const delBtn = document.createElement('button');
+    delBtn.textContent = '⌫';
+    delBtn.style.cssText = 'padding:14px 16px;background:rgba(255,80,80,0.2);border:2px solid rgba(255,80,80,0.5);color:#ff8080;border-radius:10px;font-size:20px;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;';
+    delBtn.addEventListener('click', () => { this._delete(); input.focus(); });
+
+    const goBtn = document.createElement('button');
+    goBtn.textContent = 'GO ✓';
+    goBtn.style.cssText = 'padding:14px 18px;background:linear-gradient(135deg,rgba(0,212,255,0.35),rgba(123,47,255,0.35));border:2px solid #00d4ff;color:#fff;border-radius:10px;font-size:15px;font-family:"Orbitron",sans-serif;font-weight:900;cursor:pointer;white-space:nowrap;flex-shrink:0;letter-spacing:1px;-webkit-tap-highlight-color:transparent;';
+    goBtn.addEventListener('click', () => { this._submit(); input.focus(); });
+
+    mc.appendChild(input);
+    mc.appendChild(delBtn);
+    mc.appendChild(goBtn);
+    this._mobileInput = input;
   }
 
   _startPuzzle() {
@@ -96,13 +98,14 @@ class DingbatsGame {
     this.correct = false;
     this.current = '';
     this.resultTick = 0;
-    this.timeLeft = 40;
+    this.timeLeft = 30;
     this.hintShown = false;
+    if (this._mobileInput) { this._mobileInput.value = ''; this._mobileInput.disabled = false; }
     if (this.timerId) clearInterval(this.timerId);
     this.timerId = setInterval(() => {
       if (this.answered) return;
       this.timeLeft--;
-      if (this.timeLeft === 20) this.hintShown = true;
+      if (this.timeLeft === 15) this.hintShown = true;
       if (this.timeLeft <= 0) {
         clearInterval(this.timerId);
         this._handleAnswer(false);
@@ -112,6 +115,8 @@ class DingbatsGame {
 
   _onKey(e) {
     if (this.done || this.answered) return;
+    // If a real input is focused, let it handle typing natively
+    if (document.activeElement === this._mobileInput) return;
     if (e.key === 'Enter') this._submit();
     else if (e.key === 'Backspace') this._delete();
     else if (e.key === ' ') { e.preventDefault(); this._type(' '); }
@@ -121,19 +126,24 @@ class DingbatsGame {
   _type(ch) {
     if (this.done || this.answered) return;
     this.current += ch;
+    if (this._mobileInput) this._mobileInput.value = this.current;
   }
 
   _delete() {
     if (this.done || this.answered) return;
     this.current = this.current.slice(0, -1);
+    if (this._mobileInput) this._mobileInput.value = this.current;
   }
 
   _submit() {
     if (this.done || this.answered) return;
+    // Sync from native input in case it was typed there
+    if (this._mobileInput) this.current = this._mobileInput.value;
     const p = this.puzzles[this.qIndex];
     const normalized = str => str.toUpperCase().replace(/\s+/g, ' ').trim();
     const isCorrect = normalized(this.current) === normalized(p.answer);
     this._handleAnswer(isCorrect);
+    if (this._mobileInput) { this._mobileInput.value = ''; this._mobileInput.disabled = true; }
   }
 
   _handleAnswer(isCorrect) {
@@ -197,7 +207,7 @@ class DingbatsGame {
     ctx.fillStyle = '#ffd700';
     ctx.fillText(`Score: ${this.score}`, W - 16, 26);
 
-    const tc = this.timeLeft <= 8 ? '#ff4444' : '#00ff88';
+    const tc = this.timeLeft <= 6 ? '#ff4444' : '#00ff88';
     ctx.textAlign = 'center';
     ctx.font = 'bold 20px Orbitron, sans-serif';
     ctx.fillStyle = tc;
@@ -206,7 +216,7 @@ class DingbatsGame {
     ctx.fillStyle = 'rgba(255,255,255,0.1)';
     ctx.fillRect(0, 52, W, 4);
     ctx.fillStyle = tc;
-    ctx.fillRect(0, 52, W * (this.timeLeft / 40), 4);
+    ctx.fillRect(0, 52, W * (this.timeLeft / 30), 4);
 
     // Puzzle visual area
     const pvX = 80, pvY = 80, pvW = W - 160, pvH = 200;
@@ -229,7 +239,7 @@ class DingbatsGame {
       ctx.fillText(line, pvX + pvW / 2, textStartY + i * lineH);
     });
 
-    // Hint (after 10 seconds)
+    // Hint (after 15s elapsed)
     if (this.hintShown || this.answered) {
       ctx.font = 'italic 13px Exo 2, sans-serif';
       ctx.fillStyle = 'rgba(255,215,0,0.7)';
@@ -237,7 +247,7 @@ class DingbatsGame {
       ctx.fillText(`Hint: ${p.hint}`, W / 2, pvY + pvH + 18);
     }
 
-    // Input field
+    // Input field display (shows what is typed)
     const inputY = pvY + pvH + (this.hintShown ? 44 : 28);
     ctx.strokeStyle = this.answered
       ? (this.correct ? '#00ff88' : '#ff4d6d')
