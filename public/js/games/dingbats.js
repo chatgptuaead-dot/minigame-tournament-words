@@ -20,7 +20,7 @@ class DingbatsGame {
     this.current = '';
     this.answered = false;
     this.correct = false;
-    this.timeLeft = 20;
+    this.timeLeft = 40;
     this.timerId = null;
     this.done = false;
     this.resultTick = 0;
@@ -96,13 +96,13 @@ class DingbatsGame {
     this.correct = false;
     this.current = '';
     this.resultTick = 0;
-    this.timeLeft = 20;
+    this.timeLeft = 40;
     this.hintShown = false;
     if (this.timerId) clearInterval(this.timerId);
     this.timerId = setInterval(() => {
       if (this.answered) return;
       this.timeLeft--;
-      if (this.timeLeft === 10) this.hintShown = true;
+      if (this.timeLeft === 20) this.hintShown = true;
       if (this.timeLeft <= 0) {
         clearInterval(this.timerId);
         this._handleAnswer(false);
@@ -197,7 +197,7 @@ class DingbatsGame {
     ctx.fillStyle = '#ffd700';
     ctx.fillText(`Score: ${this.score}`, W - 16, 26);
 
-    const tc = this.timeLeft <= 5 ? '#ff4444' : '#00ff88';
+    const tc = this.timeLeft <= 8 ? '#ff4444' : '#00ff88';
     ctx.textAlign = 'center';
     ctx.font = 'bold 20px Orbitron, sans-serif';
     ctx.fillStyle = tc;
@@ -206,7 +206,7 @@ class DingbatsGame {
     ctx.fillStyle = 'rgba(255,255,255,0.1)';
     ctx.fillRect(0, 52, W, 4);
     ctx.fillStyle = tc;
-    ctx.fillRect(0, 52, W * (this.timeLeft / 20), 4);
+    ctx.fillRect(0, 52, W * (this.timeLeft / 40), 4);
 
     // Puzzle visual area
     const pvX = 80, pvY = 80, pvW = W - 160, pvH = 200;
@@ -243,18 +243,18 @@ class DingbatsGame {
       ? (this.correct ? '#00ff88' : '#ff4d6d')
       : 'rgba(0,212,255,0.5)';
     ctx.lineWidth = 1.5;
-    ctx.strokeRect(pvX, inputY, pvW, 44);
-    ctx.font = 'bold 18px Exo 2, sans-serif';
+    ctx.strokeRect(pvX, inputY, pvW, 62);
+    ctx.font = 'bold 24px Exo 2, sans-serif';
     ctx.fillStyle = '#fff';
     ctx.textAlign = 'center';
     const display = this.answered ? '' : this.current + (Math.floor(this.animT / 20) % 2 === 0 ? '|' : '');
-    ctx.fillText(display, pvX + pvW / 2, inputY + 28);
+    ctx.fillText(display, pvX + pvW / 2, inputY + 40);
 
     if (this.answered) {
       ctx.textAlign = 'center';
       ctx.font = 'bold 16px Orbitron, sans-serif';
       ctx.fillStyle = this.correct ? '#00ff88' : '#ff4d6d';
-      ctx.fillText(this.correct ? `✓ CORRECT!` : `✗ Answer: ${p.answer}`, W / 2, inputY + 28);
+      ctx.fillText(this.correct ? `✓ CORRECT!` : `✗ Answer: ${p.answer}`, W / 2, inputY + 40);
     }
   }
 }

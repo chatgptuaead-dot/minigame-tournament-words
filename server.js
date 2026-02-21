@@ -9,7 +9,7 @@ const io = new Server(server, { cors: { origin: '*' } });
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-const GAME_TYPES = ['trivia', 'wordle', 'ransomnote', 'dingbats', 'wheeloffortune', 'crossword'];
+const GAME_TYPES = ['trivia', 'wordle', 'ransomnote', 'dingbats', 'wheeloffortune'];
 const BOT_NAMES = ['Robo-X', 'Byte', 'Circuit', 'Pixel', 'Glitch', 'Nano', 'Volt', 'Chip', 'Dash', 'Nova'];
 const BOT_AVATARS = ['🤖', '👾', '🦾', '⚡', '💡', '🔮', '🎯', '🌀'];
 
@@ -21,7 +21,6 @@ function getBotScore(game) {
     case 'ransomnote':     return Math.round(skill * 8);
     case 'dingbats':       return Math.round(skill * 5);
     case 'wheeloffortune': return Math.round(skill * 10);
-    case 'crossword':      return Math.round(skill * 6);
     default:               return Math.round(skill * 100);
   }
 }
@@ -191,65 +190,6 @@ const DINGBATS_ITEMS = [
   { visual: 'KNEE\nLIGHT', answer: 'NEON LIGHT', hint: 'KNEE + ON + LIGHT' },
 ];
 
-const CROSSWORD_PUZZLES = [
-  {
-    grid: [
-      ['C','A','T','S','_'],
-      ['O','_','R','_','_'],
-      ['A','P','E','S','_'],
-      ['L','_','E','_','_'],
-      ['_','_','S','_','_'],
-    ],
-    clues: {
-      across: [
-        { num: 1, row: 0, col: 0, len: 4, clue: 'Felines (4)', answer: 'CATS' },
-        { num: 3, row: 2, col: 0, len: 4, clue: 'Great primates (4)', answer: 'APES' },
-      ],
-      down: [
-        { num: 1, row: 0, col: 0, len: 4, clue: 'Fossil fuel (4)', answer: 'COAL' },
-        { num: 2, row: 0, col: 2, len: 5, clue: 'Plural of a deciduous plant (5)', answer: 'TREES' },
-      ]
-    }
-  },
-  {
-    grid: [
-      ['S','U','N','_','_'],
-      ['_','P','_','_','_'],
-      ['_','S','E','A','_'],
-      ['_','_','_','R','_'],
-      ['_','_','_','T','_'],
-    ],
-    clues: {
-      across: [
-        { num: 1, row: 0, col: 0, len: 3, clue: 'Star of our solar system (3)', answer: 'SUN' },
-        { num: 3, row: 2, col: 1, len: 3, clue: 'Large body of salt water (3)', answer: 'SEA' },
-      ],
-      down: [
-        { num: 2, row: 0, col: 1, len: 3, clue: 'Goes up (3)', answer: 'UPS' },
-        { num: 4, row: 2, col: 3, len: 3, clue: 'Fine art skill (3)', answer: 'ART' },
-      ]
-    }
-  },
-  {
-    grid: [
-      ['F','I','R','E','_'],
-      ['_','C','_','_','_'],
-      ['_','E','A','R','_'],
-      ['_','_','_','E','_'],
-      ['_','_','_','D','_'],
-    ],
-    clues: {
-      across: [
-        { num: 1, row: 0, col: 0, len: 4, clue: 'Hot flames (4)', answer: 'FIRE' },
-        { num: 3, row: 2, col: 1, len: 3, clue: 'Listen with this (3)', answer: 'EAR' },
-      ],
-      down: [
-        { num: 2, row: 0, col: 1, len: 3, clue: 'Frozen water (3)', answer: 'ICE' },
-        { num: 4, row: 2, col: 3, len: 3, clue: 'Crimson color (3)', answer: 'RED' },
-      ]
-    }
-  },
-];
 
 function getGameData(game, room) {
   if (!room.tournament.usedItems) room.tournament.usedItems = {};
@@ -316,17 +256,6 @@ function getGameData(game, room) {
       if (idx >= 0 && !used.dingbats.includes(idx)) used.dingbats.push(idx);
     });
     return { puzzles: picked };
-  }
-
-  if (game === 'crossword') {
-    if (!used.crossword) used.crossword = [];
-    const pool = CROSSWORD_PUZZLES.filter((_, i) => !used.crossword.includes(i));
-    const src = pool.length ? pool : CROSSWORD_PUZZLES;
-    const idx = Math.floor(Math.random() * src.length);
-    const puzzle = src[idx];
-    const puzzleIdx = CROSSWORD_PUZZLES.indexOf(puzzle);
-    if (!used.crossword.includes(puzzleIdx)) used.crossword.push(puzzleIdx);
-    return { puzzle };
   }
 
   return null;

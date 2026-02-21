@@ -232,11 +232,11 @@ class RansomNoteGame {
     const inputY = 170;
     ctx.strokeStyle = 'rgba(0,212,255,0.5)';
     ctx.lineWidth = 1.5;
-    ctx.strokeRect(W / 2 - 160, inputY, 320, 44);
-    ctx.font = 'bold 24px Orbitron, sans-serif';
+    ctx.strokeRect(W / 2 - 160, inputY, 320, 62);
+    ctx.font = 'bold 28px Orbitron, sans-serif';
     ctx.fillStyle = '#fff';
     ctx.textAlign = 'center';
-    ctx.fillText(this.current + (Math.floor(this.animT / 20) % 2 === 0 ? '|' : ''), W / 2, inputY + 30);
+    ctx.fillText(this.current + (Math.floor(this.animT / 20) % 2 === 0 ? '|' : ''), W / 2, inputY + 42);
 
     // Message
     if (this.messageTick > 0) {
@@ -244,7 +244,7 @@ class RansomNoteGame {
       ctx.font = 'bold 16px Exo 2, sans-serif';
       ctx.fillStyle = this.messageColor || '#fff';
       ctx.textAlign = 'center';
-      ctx.fillText(this.message, W / 2, inputY + 68);
+      ctx.fillText(this.message, W / 2, inputY + 84);
       ctx.globalAlpha = 1;
     }
 

@@ -9,7 +9,6 @@ const GAME_NAMES = {
   ransomnote:    '✂️ RANSOM NOTE',
   dingbats:      '🔍 DINGBATS',
   wheeloffortune:'🎡 WHEEL OF FORTUNE',
-  crossword:     '📰 CROSSWORD',
 };
 
 const HOW_TO_PLAY = {
@@ -18,7 +17,6 @@ const HOW_TO_PLAY = {
   ransomnote:    ['Make as many words as you can', 'All words use only letters from the big word', 'Longer words = more points — 60 seconds!'],
   dingbats:      ['Decode the visual text puzzle', 'Look at spacing, symbols, and layout', 'Type your answer and press Enter — 20s each'],
   wheeloffortune:['Guess the hidden phrase letter by letter', 'Click letters or type them on your keyboard', 'Wrong guesses fill the gallows — max 8 wrong!'],
-  crossword:     ['Click a clue, then type your answer', 'Press Enter or click Submit to confirm', 'Most correct words in 2 minutes wins!'],
 };
 
 const socket = io();
@@ -436,7 +434,6 @@ function launchGame(canvas, matchData) {
         ransomnote:     typeof RansomNoteGame      !== 'undefined' ? RansomNoteGame      : null,
         dingbats:       typeof DingbatsGame        !== 'undefined' ? DingbatsGame        : null,
         wheeloffortune: typeof WheelOfFortuneGame  !== 'undefined' ? WheelOfFortuneGame  : null,
-        crossword:      typeof CrosswordGame       !== 'undefined' ? CrosswordGame       : null,
       };
       const GameClass = gameClassByName[matchData.game];
       if (GameClass) { gameInstance = new GameClass(canvas, config); gameInstance.start(); }
