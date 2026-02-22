@@ -57,7 +57,7 @@ class RansomNoteGame {
     const mc = document.getElementById('mobile-controls');
     if (!mc) return;
     mc.className = 'mobile-controls active';
-    mc.style.cssText = 'display:flex;flex-direction:row;align-items:center;gap:8px;padding:12px 16px;pointer-events:all;position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.85);box-sizing:border-box;';
+    mc.style.cssText = 'display:flex;flex-direction:row;align-items:center;gap:10px;padding:16px 20px;pointer-events:all;position:relative;width:100%;background:rgba(0,0,0,0.92);box-sizing:border-box;flex-shrink:0;';
     mc.innerHTML = '';
 
     const input = document.createElement('input');
@@ -67,7 +67,7 @@ class RansomNoteGame {
     input.setAttribute('autocorrect', 'off');
     input.setAttribute('autocapitalize', 'characters');
     input.setAttribute('spellcheck', 'false');
-    input.style.cssText = 'flex:1;min-width:0;padding:14px 16px;background:rgba(255,255,255,0.08);border:2px solid rgba(0,212,255,0.55);color:#fff;border-radius:10px;font-size:20px;font-family:"Exo 2",sans-serif;font-weight:700;outline:none;letter-spacing:2px;caret-color:#00d4ff;-webkit-appearance:none;';
+    input.style.cssText = 'flex:1;min-width:0;padding:18px 20px;background:rgba(255,255,255,0.1);border:2.5px solid rgba(0,212,255,0.7);color:#fff;border-radius:14px;font-size:26px;font-family:"Exo 2",sans-serif;font-weight:700;outline:none;letter-spacing:2px;caret-color:#00d4ff;-webkit-appearance:none;touch-action:manipulation;';
 
     input.addEventListener('input', () => {
       this.current = input.value.toUpperCase().replace(/[^A-Z]/g, '');
@@ -79,12 +79,12 @@ class RansomNoteGame {
 
     const delBtn = document.createElement('button');
     delBtn.textContent = '⌫';
-    delBtn.style.cssText = 'padding:14px 16px;background:rgba(255,80,80,0.2);border:2px solid rgba(255,80,80,0.5);color:#ff8080;border-radius:10px;font-size:20px;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;';
+    delBtn.style.cssText = 'padding:18px 20px;background:rgba(255,80,80,0.2);border:2px solid rgba(255,80,80,0.5);color:#ff8080;border-radius:14px;font-size:24px;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;';
     delBtn.addEventListener('click', () => { this._delete(); input.focus(); });
 
     const submitBtn = document.createElement('button');
     submitBtn.textContent = '↵ ADD';
-    submitBtn.style.cssText = 'padding:14px 16px;background:linear-gradient(135deg,rgba(0,255,136,0.3),rgba(0,212,255,0.3));border:2px solid #00ff88;color:#fff;border-radius:10px;font-size:14px;font-family:"Orbitron",sans-serif;font-weight:900;cursor:pointer;white-space:nowrap;flex-shrink:0;letter-spacing:1px;-webkit-tap-highlight-color:transparent;';
+    submitBtn.style.cssText = 'padding:18px 20px;background:linear-gradient(135deg,rgba(0,255,136,0.35),rgba(0,212,255,0.35));border:2px solid #00ff88;color:#fff;border-radius:14px;font-size:17px;font-family:"Orbitron",sans-serif;font-weight:900;cursor:pointer;white-space:nowrap;flex-shrink:0;letter-spacing:1px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;';
     submitBtn.addEventListener('click', () => { this._submit(); input.focus(); });
 
     mc.appendChild(input);
